@@ -1,28 +1,38 @@
-name: Deploy to Railway
+name: 🚀 Deploy Django with Admin Panel and Client App
 
 on:
   push:
     branches:
-      - main
+      - main  # yoki master bo‘lsa, o‘zgartiring
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Set up Python
+    steps:
+      - name: 📥 Kodni yuklash
+        uses: actions/checkout@v3
+
+      - name: 🐍 Python 3.10 o‘rnatish
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
 
-      - name: Install dependencies
+      - name: 📦 Kutubxonalarni o‘rnatish
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run migrations
-        run: python manage.py migrate
+      - name: 🔄 `client` app uchun migratsiyalarni bajarish
+        run: |
+          python manage.py makemigrations client
+          python manage.py migrate
 
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput
+      - name: 👤 Admin panel uchun superuser yaratish
+        run: |
+          echo "
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+" | python manage.py shell
