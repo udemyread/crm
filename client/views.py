@@ -14,6 +14,14 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({'message': 'Client o‘chirildi'}, status=status.HTTP_200_OK)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
     @action(detail=False, methods=['get'], url_path='stats', renderer_classes=[JSONRenderer])
     def stats(self, request):
         total_clients = Client.objects.count()
